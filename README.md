@@ -1,3 +1,12 @@
+# Cross64 README -> Mupen64Plus-Core
+
+Changes made to this repo from the vanilla are the following:
+- expand the 8mb ram expansion size to 16mb
+- add save directory override
+- add api to access the rdram and rom memory externally
+- add api to get the 'cart-data'
+- add function to 'refresh the cache' of the dynarec so injected asm works.
+
 # Mupen64Plus-Core README
 
 [![TravisCI Build Status](https://travis-ci.org/mupen64plus/mupen64plus-core.svg?branch=master)](https://travis-ci.org/mupen64plus/mupen64plus-core) 
