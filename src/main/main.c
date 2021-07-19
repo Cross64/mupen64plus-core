@@ -343,14 +343,14 @@ int main_set_core_defaults(void)
 #endif
     ConfigSetDefaultBool(g_CoreConfig, "NoCompiledJump", 0, "Disable compiled jump commands in dynamic recompiler (should be set to False) ");
     ConfigSetDefaultBool(g_CoreConfig, "DisableExtraMem", 0, "Disable 4MB expansion RAM pack. May be necessary for some games");
+    ConfigSetDefaultInt(g_CoreConfig, "CountPerOp", 0, "Force number of cycles per emulated instruction");
     ConfigSetDefaultBool(g_CoreConfig, "AutoStateSlotIncrement", 0, "Increment the save state slot after each save operation");
-    ConfigSetDefaultBool(g_CoreConfig, "EnableDebugger", 0, "Activate the R4300 debugger when ROM execution begins, if core was built with Debugger support");
     ConfigSetDefaultInt(g_CoreConfig, "CurrentStateSlot", 0, "Save state slot (0-9) to use when saving/loading the emulator state");
+    ConfigSetDefaultBool(g_CoreConfig, "EnableDebugger", 0, "Activate the R4300 debugger when ROM execution begins, if core was built with Debugger support");
     ConfigSetDefaultString(g_CoreConfig, "ScreenshotPath", "", "Path to directory where screenshots are saved. If this is blank, the default value of ${UserDataPath}/screenshot will be used");
     ConfigSetDefaultString(g_CoreConfig, "SaveStatePath", "", "Path to directory where emulator save states (snapshots) are saved. If this is blank, the default value of ${UserDataPath}/save will be used");
     ConfigSetDefaultString(g_CoreConfig, "SaveSRAMPath", "", "Path to directory where SRAM/EEPROM data (in-game saves) are stored. If this is blank, the default value of ${UserDataPath}/save will be used");
     ConfigSetDefaultString(g_CoreConfig, "SharedDataPath", "", "Path to a directory to search when looking for shared data files");
-    ConfigSetDefaultInt(g_CoreConfig, "CountPerOp", 0, "Force number of cycles per emulated instruction");
     ConfigSetDefaultBool(g_CoreConfig, "RandomizeInterrupt", 1, "Randomize PI/SI Interrupt Timing");
     ConfigSetDefaultInt(g_CoreConfig, "SiDmaDuration", -1, "Duration of SI DMA (-1: use per game settings)");
     ConfigSetDefaultString(g_CoreConfig, "GbCameraVideoCaptureBackend1", DEFAULT_VIDEO_CAPTURE_BACKEND, "Gameboy Camera Video Capture backend");
@@ -1052,7 +1052,7 @@ static void open_eep_file(struct file_storage* fstorage)
     }
 
     /* Truncate to 4k bit if necessary */
-    if (ROM_SETTINGS.savetype != SAVETYPE_EEPROM_16KB) {
+    if (ROM_SETTINGS.savetype != SAVETYPE_EEPROM_16K) {
         fstorage->size = 0x200;
     }
 }
@@ -1458,6 +1458,15 @@ m64p_error main_run(void)
     /* XXX: select type of flashram from db */
     uint32_t flashram_type = MX29L1100_ID;
 
+    uint16_t eeprom_type = JDT_NONE;
+    switch (ROM_SETTINGS.savetype) {
+        case SAVETYPE_EEPROM_4K:
+            eeprom_type = JDT_EEPROM_4K;
+            break;
+        case SAVETYPE_EEPROM_16K:
+            eeprom_type = JDT_EEPROM_16K;
+            break;
+    }
 
     /* take the r4300 emulator mode from the config file at this point and cache it in a global variable */
     emumode = ConfigGetParamInt(g_CoreConfig, "R4300Emulator");
@@ -1714,7 +1723,7 @@ m64p_error main_run(void)
                 vi_clock_from_tv_standard(ROM_PARAMS.systemtype), vi_expected_refresh_rate_from_tv_standard(ROM_PARAMS.systemtype),
                 NULL, &g_iclock_ctime_plus_delta,
                 g_rom_size,
-                (ROM_SETTINGS.savetype != SAVETYPE_EEPROM_16KB) ? JDT_EEPROM_4K : JDT_EEPROM_16K,
+                eeprom_type,
                 &eep, &g_ifile_storage,
                 flashram_type,
                 &fla, &g_ifile_storage,
