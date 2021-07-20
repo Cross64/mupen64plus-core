@@ -57,6 +57,12 @@ endif
 # detect system architecture
 HOST_CPU ?= $(shell uname -m)
 CPU := NONE
+ifeq ("$(patsubst MINGW32%,MINGW32,$(UNAME))","MINGW32")
+  HOST_CPU = X86
+  CPU := X86
+  ARCH_DETECTED := 32BITS
+  PIC ?= 0
+endif
 ifneq ("$(filter x86_64 amd64,$(HOST_CPU))","")
   CPU := X86
   ifeq ("$(BITS)", "32")
