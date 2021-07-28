@@ -142,6 +142,15 @@ typedef m64p_error(*ptr_CoreSaveOverride)(const char *);
 EXPORT m64p_error CALL CoreSaveOverride(const char *);
 #endif
 
+/* GetHeader()
+ *
+ * This function will return a pointer to the ROM_HEADER.
+ */
+typedef void*(*ptr_GetHeader)();
+#if defined(M64P_CORE_PROTOTYPES)
+EXPORT void* CALL GetHeader();
+#endif
+
 /* GetRdRam()
  *
  * This function will return a pointer to the RDRAM.

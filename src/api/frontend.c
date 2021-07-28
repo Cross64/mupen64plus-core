@@ -447,6 +447,9 @@ EXPORT m64p_error CALL CoreSaveOverride(const char* path)
 // ## Memory Info
 // #########################################################
 
+#include "main/rom.h"
+EXPORT void* CALL GetHeader() { return (void*)&ROM_HEADER; }
+
 EXPORT void* CALL GetRdRam() { return (void*)g_dev.rdram.dram; }
 EXPORT void* CALL GetRom() { return (void*)mem_base_u32(g_mem_base, MM_CART_ROM); }
 
